@@ -1,25 +1,25 @@
 <template>
-    
     <div>
         <UserForm
             v-model="user"
             @validityChange="validityChange($event)"
         />
+        <div class="flex justify-center gap-6 mt-4">
+            <button
+                @click="createUser(user)"
+                :disabled="!isValid"
+                class="btn-proceed"
+            >
+                更新する
+            </button>
 
-        <button
-            @click="createUser(user)"
-            :disabled="!isValid"
-            class="bg-blue-500 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-600 transition mt-4"
-        >
-            更新する
-        </button>
-
-        <NuxtLink
-            class="inline-block mt-4 bg-gray-400 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-600 transition"
-            to="/users"
-        >
-            戻る
-        </NuxtLink>
+            <NuxtLink
+                class="btn-back"
+                to="/users"
+            >
+                戻る
+            </NuxtLink>
+        </div>
     </div>
 </template>
 
