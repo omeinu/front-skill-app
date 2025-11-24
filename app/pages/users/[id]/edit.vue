@@ -4,6 +4,7 @@
         <UserForm
             v-model="user"
             @validityChange="validityChange($event)"
+            @submit="updateUser(user)"
         />
         <div class="flex justify-center gap-6 mt-4">
 
@@ -27,20 +28,23 @@
 
 <script setup lang="ts">
 
-    import { ref, onMounted } from 'vue';
+    import { ref } from 'vue';
     import type { User } from '~/types/user';
     import UserForm from '~/components/users/UserForm.vue';
+    import { useUserStore } from '~/stores/user';
 
-    onMounted(() => {
-        console.log('〜〜〜編集ページのMountedだよ〜〜〜');
-    });
-
+    const userStore = useUserStore();
     const route = useRoute();
     const id = Number(route.params.id);
 
     const { data: user } = await useFetch<User>(`/api/users/${id}`);
 
     const updateUser = async (updatedUser: User) => {
+
+        if (!isValid.value) {
+            return;
+        }
+
         await fetch(`/api/users/${id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -48,6 +52,7 @@
         });
 
         alert('ユーザー情報を更新しました！');
+        await userStore.fetchUsers(true)
         navigateTo('/users');
     };
 

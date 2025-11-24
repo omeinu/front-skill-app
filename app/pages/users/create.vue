@@ -3,6 +3,7 @@
         <UserForm
             v-model="user"
             @validityChange="validityChange($event)"
+            @submit="createUser(user)"
         />
         <div class="flex justify-center gap-6 mt-4">
             <button
@@ -28,6 +29,7 @@
     import { reactive, ref } from 'vue';
     import type { User } from '~/types/user';
     import UserForm from '~/components/users/UserForm.vue';
+    import { useUserStore } from '~/stores/user';
 
     const user = reactive<User>({
         id: 0,
@@ -35,7 +37,13 @@
         age: 0 
     });
 
+    const userStore = useUserStore();
+
     const createUser = async (newUser: User) => {
+
+        if (!isValid.value) {
+            return;
+        }
         
         await fetch(`/api/users`, {
             method: 'POST',
@@ -44,6 +52,7 @@
         });
 
         alert('ユーザーを新規作成しました！');
+        await userStore.fetchUsers(true);
         navigateTo('/users');
     };
 

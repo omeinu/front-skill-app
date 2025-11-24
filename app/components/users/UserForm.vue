@@ -1,39 +1,55 @@
 <template>
-    <div v-for="field in fields" :key="field.key">
-        <label>{{ field.label }}</label>
-        <input
-            :type="field.type"
-            v-model="user[field.key]"
-            @input="touched[field.key] = true"
-            :placeholder="field.label"
-            class="border p-2 mb-4 w-full"
-        />
-
-        <div
-            v-if="field.key === 'name' && touched.name && nameError"
-            class="text-red-500 mb-4"
-        >
-            {{ nameError }}
+    <form @submit.prevent="emit('submit')">
+    <!-- 名前 -->
+        <div>
+            <label>名前</label>
+            <input
+                ref="nameInput"
+                type="text"
+                v-model="user.name"
+                @input="touched.name = true"
+                placeholder="名前"
+                class="border p-2 mb-2 w-full"
+            />
+            <div class="min-h-[24px]">
+                <p
+                v-show="touched.name && nameError"
+                class="text-red-500"
+                >
+                {{ nameError }}
+                </p>
+            </div>
         </div>
 
-        <div
-            v-if="field.key === 'age' && touched.age && ageError"
-            class="text-red-500 mb-4"
-        >
-            {{ ageError }}
+        <!-- 年齢 -->
+        <div>
+            <label>年齢</label>
+            <input
+                type="number"
+                v-model="user.age"
+                @input="touched.age = true"
+                placeholder="年齢"
+                class="border p-2 mb-2 w-full"
+            />
+            <div class="min-h-[24px]">
+                <p
+                v-show="touched.age && ageError"
+                class="text-red-500"
+                >
+                {{ ageError }}
+                </p>
+            </div>
         </div>
-    </div>
+        <button type="submit" class="hidden"></button>
+    </form>
 </template>
 
 <script setup lang="ts">
 import type { User } from '~/types/user';
-import { reactive, watch } from 'vue';
+import { ref, reactive, watch, nextTick, onMounted } from 'vue';
 import { useUserValidation } from '~/composables/useValidation';
 
-// フォームで扱うキーを限定
-type EditableKey = 'name' | 'age';
-
-const touched = reactive<Record<EditableKey, boolean>>({
+const touched = reactive({
     name: false,
     age: false,
 });
@@ -50,14 +66,10 @@ const user = reactive<User>(
 
 const { nameError, ageError, isValid } = useUserValidation(user);
 
-const fields: { key: EditableKey; label: string; type: string }[] = [
-    { key: 'name', label: '名前', type: 'text' },
-    { key: 'age', label: '年齢', type: 'number' },
-];
-
 const emit = defineEmits<{
     (e: 'update:modelValue', value: User): void;
     (e: 'validityChange', isValid: boolean): void;
+    (e: 'submit'): void;
 }>();
 
 watch(
@@ -75,4 +87,11 @@ watch(
     },
     { immediate: true }
 );
+
+const nameInput = ref<HTMLInputElement | null>(null)
+
+onMounted(async () => {
+    await nextTick()
+    nameInput.value?.focus()
+})
 </script>
