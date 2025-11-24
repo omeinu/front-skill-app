@@ -7,6 +7,10 @@ module.exports = {
         '^.+\\.js$': 'babel-jest'
     },
     moduleNameMapper: {
-        '^@/(.*)$': '<rootDir>/$1'
+        '^@/(.*)$': '<rootDir>/app/$1',
+        '^~/(.*)$': '<rootDir>/app/$1',
+        '^@vue/test-utils$':
+            '<rootDir>/node_modules/@vue/test-utils/dist/vue-test-utils.cjs.js',
     }
+
 }

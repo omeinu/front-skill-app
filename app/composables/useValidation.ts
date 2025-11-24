@@ -45,6 +45,8 @@ export function useUserValidation(user: { name: string; age: number | string }) 
     return {
         nameError,
         ageError,
-        isValid
+        isValid,
+        validateName,
+        validateAge,
     }
 }

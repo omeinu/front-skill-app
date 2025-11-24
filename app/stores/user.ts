@@ -1,26 +1,35 @@
 import { defineStore } from 'pinia';
 import type { User } from '~/types/user';
 
-export const useUserStore = defineStore('user', () => {
+export const useUserStore = defineStore('user', {
 
-    const users = ref<User[]>([]);
+    state: () => ({
+        users: [] as User[],
+    }),
 
-    const fetchUsers = async () => {
-        const { data } = await useFetch<User[]>('/api/users');
-        users.value = data.value || [];
-    };
+    actions: {
+        async fetchUsers(force = false) {
+            if (!force && this.users.length > 0) {
+                return
+            }
+        
+            const { data } = await useFetch<User[]>('/api/users', {
+                key: 'user-list-' + Date.now(),
+                server: false,
+                immediate: true,
+                default: () => []
+            });
 
-    const deleteUser = async (id: number) => {
-        await useFetch(`/api/users/${id}`, {
-            method: 'DELETE',
-        });
-        // ローカルの users 配列から削除
-        users.value = users.value.filter(user => user.id !== id);
-    }
-
-    return {
-        users,
-        fetchUsers,
-        deleteUser,
-    };
+            this.users = data.value || [];
+        },
+    
+        async deleteUser(id: number) {
+            await useFetch(`/api/users/${id}`, {
+                method: 'DELETE',
+            });
+            // ローカルの users 配列から削除
+            this.users = this.users.filter(user => user.id !== id);
+        }
+    },
+    persist: true
 });
